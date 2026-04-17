@@ -1,0 +1,62 @@
+"""Design a normalized Hospital Management Database schema with the tables:
+Doctors, Patients, and Appointments.
+
+Add proper constraints:
+- Primary keys
+- Foreign keys
+- Unique IDs
+- Valid date constraints
+
+Then write SQL queries for:
+1. List all appointments for a specific doctor.
+2. Retrieve patient history by patient ID.
+3. Count total patients treated by each doctor.
+
+Use standard SQL compatible with SQLite. insertr values into the tables to demonstrate the functionality of the queries."""
+-- Create Doctors table
+CREATE TABLE Doctors (
+    doctor_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    specialty TEXT NOT NULL
+);
+-- Create Patients table
+CREATE TABLE Patients (
+    patient_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    date_of_birth DATE NOT NULL
+);
+-- Create Appointments table
+CREATE TABLE Appointments (
+    appointment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    doctor_id INTEGER NOT NULL,
+    patient_id INTEGER NOT NULL,
+    appointment_date DATE NOT NULL,
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id),
+    FOREIGN KEY (patient_id) REFERENCES Patients(patient_id)
+);
+-- Insert sample data into Doctors
+INSERT INTO Doctors (name, specialty) VALUES ('Dr. Smith', 'Cardiology');
+INSERT INTO Doctors (name, specialty) VALUES ('Dr. Johnson', 'Neurology');
+-- Insert sample data into Patients
+INSERT INTO Patients (name, date_of_birth) VALUES ('Alice Brown', '1980-05-15');
+INSERT INTO Patients (name, date_of_birth) VALUES ('Bob Green', '1990-08-22');
+-- Insert sample data into Appointments
+INSERT INTO Appointments (doctor_id, patient_id, appointment_date) VALUES (1, 1, '2024-07-01');
+INSERT INTO Appointments (doctor_id, patient_id, appointment_date) VALUES (1, 2, '2024-07-02');
+INSERT INTO Appointments (doctor_id, patient_id, appointment_date) VALUES (2, 1, '2024-07-03');
+-- Query 1: List all appointments for a specific doctor (e.g., Dr. Smith)
+SELECT a.appointment_id, p.name AS patient_name, a.appointment_date
+FROM Appointments a
+JOIN Patients p ON a.patient_id = p.patient_id
+WHERE a.doctor_id = 1;
+-- Query 2: Retrieve patient history by patient ID (e.g., patient_id = 1)
+SELECT a.appointment_id, d.name AS doctor_name, a.appointment_date
+FROM Appointments a
+JOIN Doctors d ON a.doctor_id = d.doctor_id
+WHERE a.patient_id = 1;
+-- Query 3: Count total patients treated by each doctor
+SELECT d.name AS doctor_name, COUNT(DISTINCT a.patient_id) AS total_patients
+FROM Doctors d
+LEFT JOIN Appointments a ON d.doctor_id = a.doctor_id
+GROUP BY d.doctor_id;
+
